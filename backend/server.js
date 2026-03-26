@@ -9,6 +9,9 @@ import connectToMongoDB from './db/connectToMongoDB.js';
 import cookieParser from 'cookie-parser';
 import { initializeSocketHandlers } from './socket/socket.js';
 
+// Load environment variables FIRST
+dotenv.config();
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -20,8 +23,6 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 5000;
-
-dotenv.config();
 
 // ===== MIDDLEWARES =====
 // Parse incoming requests with JSON payloads
@@ -43,9 +44,31 @@ app.use((req, res, next) => {
 });
 
 // ===== ROUTES =====
+// Health check endpoint
+app.get("/", (req, res) => {
+	res.status(200).json({ message: "🚀 API is running" });
+});
+
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
+
+// ===== ERROR HANDLING =====
+// 404 Not Found Handler
+app.use((req, res) => {
+	res.status(404).json({ error: "Route not found" });
+});
+
+// Global Error Handler Middleware
+app.use((err, req, res, next) => {
+	console.error("Error:", err.message);
+	const statusCode = err.statusCode || 500;
+	res.status(statusCode).json({ 
+		error: err.message || "Internal Server Error",
+		status: statusCode
+	});
+});
 
 // ===== SOCKET.IO INITIALIZATION =====
 initializeSocketHandlers(io);
@@ -55,13 +78,5 @@ server.listen(PORT, () => {
 	connectToMongoDB();
 	console.log(`🚀 Server is running on port ${PORT}`);
 	console.log(`📱 Socket.IO is connected and listening for events`);
-}); 
-
-
-/*
-app.get('/', (req, res) => {
-    // root route http://localhost:5000/
-  res.send('Server is running!');
-
+	console.log(`🔌 Environment: ${process.env.NODE_ENV || "development"}`);
 });
-*/
