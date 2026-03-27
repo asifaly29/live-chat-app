@@ -6,10 +6,18 @@ export default defineConfig({
 	plugins: [react()],
 	server: {
 		port: 3000,
+		// Proxy API calls to backend in development only
 		proxy: {
 			"/api": {
-				target: "http://localhost:5000",
+				target: process.env.VITE_API_URL || "http://localhost:5000",
+				changeOrigin: true,
+				rewrite: (path) => path,
 			},
 		},
+	},
+	build: {
+		// Optimize build output
+		sourcemap: false,
+		minify: "terser",
 	},
 });

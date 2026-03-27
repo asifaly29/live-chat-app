@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { useAuthContext } from "./AuthContext";
+import { SERVER_URL } from "../utils/apiConfig";
 import io from "socket.io-client";
 
 const SocketContext = createContext();
@@ -15,8 +16,8 @@ export const SocketContextProvider = ({ children }) => {
 
 	useEffect(() => {
 		if (authUser) {
-			// Use environment variable for server URL, fallback to production URL
-			const serverUrl = import.meta.env.VITE_SERVER_URL || "https://chat-app-yt.onrender.com";
+			// Use SERVER_URL from centralized configuration
+			const serverUrl = SERVER_URL;
 
 			const socket = io(serverUrl, {
 				query: {
