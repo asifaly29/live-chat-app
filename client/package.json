@@ -1,14 +1,15 @@
 {
-  "name": "frontend",
+  "name": "client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "start": "serve -s dist",
     "build": "vite build",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "start": "vite preview"
+    "preview": "serve -s dist",
+    "dev": "vite"
+  },
+>>>>>>> 8865c6c (fix: prepare MERN app for Render deployment):client/package.json
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -30,6 +31,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.33",
+    "serve": "^14.2.1",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.8"
   }

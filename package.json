@@ -2,11 +2,11 @@
 	"name": "chat-app-yt",
 	"version": "1.0.0",
 	"description": "",
-	"main": "server.js",
+	"main": "server/index.js",
 	"scripts": {
-		"server": "nodemon backend/server.js",
-		"start": "node backend/server.js",
-		"build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
+		"start": "node server/index.js",
+		"dev": "nodemon server/index.js",
+		"build": "npm install && npm install --prefix client && npm run build --prefix client",
 		"vercel-build": "echo 'No build needed for backend'"
 	},
 	"type": "module",
