@@ -10,12 +10,14 @@ const useSendMessage = () => {
 	const sendMessage = async (message) => {
 		setLoading(true);
 		try {
+			// CHANGED: Added credentials: "include" for cookie-based auth to work across domains
 			const res = await fetch(getAPIEndpoint(`/api/messages/send/${selectedConversation._id}`), {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ message }),
+				credentials: "include", // Required for CORS with cookies in production
 			});
 			const data = await res.json();
 			if (data.error) throw new Error(data.error);

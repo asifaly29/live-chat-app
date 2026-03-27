@@ -12,10 +12,12 @@ const useLogin = () => {
 		if (!success) return;
 		setLoading(true);
 		try {
+			// CHANGED: Added credentials: "include" for cookie-based auth to work across domains
 			const res = await fetch(getAPIEndpoint("/api/auth/login"), {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ username, password }),
+				credentials: "include", // Required for CORS with cookies in production
 			});
 
 			const data = await res.json();

@@ -37,6 +37,7 @@ export const sendMessage = async (req, res) => {
 			senderId,
 			receiverId,
 			message,
+			seen: false,
 		});
 
 		if (newMessage) {
@@ -68,6 +69,46 @@ export const sendMessage = async (req, res) => {
 		res.status(201).json(newMessage);
 	} catch (error) {
 		console.error("Error in sendMessage controller:", error.message);
+		res.status(500).json({ error: "Internal Server Error" });
+	}
+};
+
+/**
+ * Get unread message counts grouped by sender for logged-in user
+ */
+export const getUnreadMessages = async (req, res) => {
+	try {
+		const userId = req.user._id;
+
+		const results = await Message.aggregate([
+			{ $match: { receiverId: userId, seen: false } },
+			{ $group: { _id: "$senderId", count: { $sum: 1 } } },
+			{ $project: { _id: 0, senderId: "$_id", count: 1 } },
+		]);
+
+		res.status(200).json(results);
+	} catch (error) {
+		console.error("Error in getUnreadMessages controller:", error.message);
+		res.status(500).json({ error: "Internal Server Error" });
+	}
+};
+
+/**
+ * Mark messages from a sender as seen for logged-in user
+ */
+export const markMessagesAsSeen = async (req, res) => {
+	try {
+		const senderId = req.params.senderId;
+		const receiverId = req.user._id;
+
+		const result = await Message.updateMany(
+			{ senderId, receiverId, seen: false },
+			{ $set: { seen: true } }
+		);
+
+		res.status(200).json({ modifiedCount: result.modifiedCount });
+	} catch (error) {
+		console.error("Error in markMessagesAsSeen controller:", error.message);
 		res.status(500).json({ error: "Internal Server Error" });
 	}
 };

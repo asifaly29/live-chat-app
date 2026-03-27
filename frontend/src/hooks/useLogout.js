@@ -10,9 +10,11 @@ const useLogout = () => {
 	const logout = async () => {
 		setLoading(true);
 		try {
+			// CHANGED: Added credentials: "include" for cookie-based auth across domains
 			const res = await fetch(getAPIEndpoint("/api/auth/logout"), {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
+				credentials: "include", // Required for CORS with cookies in production
 			});
 			const data = await res.json();
 			if (data.error) {

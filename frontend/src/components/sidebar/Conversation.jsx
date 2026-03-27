@@ -1,8 +1,8 @@
 import { useSocketContext } from "../../context/SocketContext";
 import useConversation from "../../zustand/useConversation";
 
-const Conversation = ({ conversation, lastIdx, emoji }) => {
-	const { selectedConversation, setSelectedConversation } = useConversation();
+const Conversation = ({ conversation, lastIdx, emoji, unreadCount = 0, onConversationClick }) => {
+	const { selectedConversation } = useConversation();
 
 	const isSelected = selectedConversation?._id === conversation._id;
 	const { onlineUsers } = useSocketContext();
@@ -14,7 +14,7 @@ const Conversation = ({ conversation, lastIdx, emoji }) => {
 				className={`flex gap-2 items-center hover:bg-sky-500 rounded p-2 py-1 cursor-pointer
 				${isSelected ? "bg-sky-500" : ""}
 			`}
-				onClick={() => setSelectedConversation(conversation)}
+				onClick={() => onConversationClick(conversation)}
 			>
 				<div className={`avatar ${isOnline ? "online" : ""}`}>
 					<div className='w-12 rounded-full'>
@@ -23,9 +23,16 @@ const Conversation = ({ conversation, lastIdx, emoji }) => {
 				</div>
 
 				<div className='flex flex-col flex-1'>
-					<div className='flex gap-3 justify-between'>
+					<div className='flex gap-3 justify-between items-center'>
 						<p className='font-bold text-gray-200'>{conversation.fullName}</p>
-						<span className='text-xl'>{emoji}</span>
+						<div className='flex items-center gap-2'>
+							{unreadCount > 0 && (
+								<span className='bg-red-500 text-white text-xs px-2 py-1 rounded-full'>
+									{unreadCount}
+								</span>
+							)}
+							<span className='text-xl'>{emoji}</span>
+						</div>
 					</div>
 				</div>
 			</div>

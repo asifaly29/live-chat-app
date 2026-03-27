@@ -10,7 +10,10 @@ const useGetConversations = () => {
 		const getConversations = async () => {
 			setLoading(true);
 			try {
-				const res = await fetch(getAPIEndpoint("/api/users"));
+				// CHANGED: Added credentials: "include" for cookie-based auth across domains
+				const res = await fetch(getAPIEndpoint("/api/users"), {
+					credentials: "include", // Required for CORS with cookies in production
+				});
 				const data = await res.json();
 				if (data.error) {
 					throw new Error(data.error);

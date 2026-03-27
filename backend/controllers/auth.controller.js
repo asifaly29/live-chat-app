@@ -38,17 +38,29 @@ export const signup = async (req, res) => {
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
 
-		// ===== GENERATE PROFILE PICTURE =====
-		const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
-		const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
+		// ===== NORMALIZE INPUT =====
+		const normalizedUsername = username?.toLowerCase() || "";
+		const normalizedGender = gender?.toLowerCase();
+
+		// ===== AVATAR STYLE =====
+		const avatarStyle =
+			normalizedGender === "male"
+				? "set1"
+				: normalizedGender === "female"
+				? "set4"
+				: "set2";
+
+		const seed = normalizedUsername || "guest";
+		const defaultProfilePic = `https://robohash.org/${encodeURIComponent(seed)}?set=${avatarStyle}`;
+		const profilePic = req.body.profilePic || defaultProfilePic;
 
 		// ===== CREATE NEW USER =====
 		const newUser = new User({
 			fullName,
-			username: username.toLowerCase(),
+			username: normalizedUsername,
 			password: hashedPassword,
-			gender: gender.toLowerCase(),
-			profilePic: gender.toLowerCase() === "male" ? boyProfilePic : girlProfilePic,
+			gender: normalizedGender,
+			profilePic,
 		});
 
 		if (newUser) {

@@ -1,6 +1,11 @@
 /**
  * API Configuration utility
  * Centralizes API URL and Server URL configuration for development and production
+ * 
+ * CHANGED: Updated for Vercel production deployment
+ * Set environment variables in Vercel project settings:
+ * - VITE_API_URL: Backend API URL (e.g., https://chat-backend.vercel.app)
+ * - VITE_SERVER_URL: WebSocket server URL (e.g., https://chat-backend.vercel.app)
  */
 
 // API URL for REST endpoints
@@ -20,7 +25,7 @@ export const getAPIEndpoint = (path) => {
 	if (import.meta.env.DEV) {
 		return path; // Use Vite proxy in development
 	}
-	// In production, use full URL
+	// In production, use full URL with API_URL
 	return `${API_URL}${path}`;
 };
 

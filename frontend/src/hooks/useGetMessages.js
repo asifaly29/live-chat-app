@@ -11,7 +11,10 @@ const useGetMessages = () => {
 		const getMessages = async () => {
 			setLoading(true);
 			try {
-				const res = await fetch(getAPIEndpoint(`/api/messages/${selectedConversation._id}`));
+				// CHANGED: Added credentials: "include" for cookie-based auth across domains
+				const res = await fetch(getAPIEndpoint(`/api/messages/${selectedConversation._id}`), {
+					credentials: "include", // Required for CORS with cookies in production
+				});
 				const data = await res.json();
 				if (data.error) throw new Error(data.error);
 				setMessages(data);

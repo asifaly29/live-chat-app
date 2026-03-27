@@ -1,6 +1,7 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+import cors from 'cors'; // CHANGED: Import cors package for proper CORS handling
 import dotenv from "dotenv";
 import authRoutes from './routes/auth.routes.js';
 import messageRoutes from './routes/message.routes.js';
@@ -24,24 +25,21 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 5000;
 
-// ===== MIDDLEWARES =====
+// ===== MIDDLEWARES (Production-ready for Vercel) =====
 // Parse incoming requests with JSON payloads
 app.use(express.json());
 // Middleware to parse cookies
 app.use(cookieParser());
 
-// CORS headers for REST API
-app.use((req, res, next) => {
-	res.header("Access-Control-Allow-Origin", process.env.CLIENT_URL || "http://localhost:3000");
-	res.header("Access-Control-Allow-Credentials", "true");
-	res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-	res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-	if (req.method === "OPTIONS") {
-		res.sendStatus(200);
-	} else {
-		next();
-	}
-});
+// CHANGED: Use cors package for production-ready CORS configuration
+// This properly handles preflight requests and is compatible with Vercel serverless
+// Set CLIENT_URL env var to frontend domain (e.g., https://yourfrontend.vercel.app)
+app.use(cors({
+	origin: process.env.CLIENT_URL || "http://localhost:3000", // Frontend URL from environment
+	methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+	credentials: true, // Allow cookies in cross-origin requests
+	allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 // ===== ROUTES =====
 // Health check endpoint

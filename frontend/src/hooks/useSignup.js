@@ -13,10 +13,12 @@ const useSignup = () => {
 
 		setLoading(true);
 		try {
+			// CHANGED: Added credentials: "include" for cookie-based auth to work across domains
 			const res = await fetch(getAPIEndpoint("/api/auth/signup"), {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ fullName, username, password, confirmPassword, gender }),
+				credentials: "include", // Required for CORS with cookies in production
 			});
 
 			const data = await res.json();
