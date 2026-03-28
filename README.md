@@ -2,6 +2,28 @@
 
 A full-stack MERN chat application with real-time messaging, online users tracking, and production-ready deployment setup.
 
+**✨ NOW WORKS WITH DEPLOYED RAILWAY BACKEND - NO LOCAL BACKEND NEEDED!**
+
+---
+
+## 🚀 Quick Start (Frontend Only)
+
+### Prerequisites
+- Node.js 16+
+
+### Start the Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The app will be available at: `http://localhost:5173`
+
+That's it! The frontend automatically connects to the deployed Railway backend.
+
+**See [RAILWAY_BACKEND_SETUP.md](./RAILWAY_BACKEND_SETUP.md) for detailed setup instructions.**
+
 ---
 
 ## ✨ Features

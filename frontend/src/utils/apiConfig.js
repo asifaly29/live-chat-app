@@ -1,11 +1,11 @@
 /**
  * API Configuration utility
- * Centralizes API URL and Server URL configuration for development and production
+ * Centralizes API URL and Server URL configuration
+ * Updated to work with deployed Railway backend
  * 
- * CHANGED: Updated for Vercel production deployment
- * Set environment variables in Vercel project settings:
- * - VITE_API_URL: Backend API URL (e.g., https://chat-backend.vercel.app)
- * - VITE_SERVER_URL: WebSocket server URL (e.g., https://chat-backend.vercel.app)
+ * Environment variables:
+ * - VITE_API_URL: Backend API URL (https://live-chat-app-production-69b9.up.railway.app)
+ * - VITE_SERVER_URL: WebSocket server URL (https://live-chat-app-production-69b9.up.railway.app)
  */
 
 // API URL for REST endpoints
@@ -14,18 +14,17 @@ export const API_URL = import.meta.env.VITE_API_URL || "https://live-chat-app-pr
 // Server URL for Socket.IO connections
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL || "https://live-chat-app-production-69b9.up.railway.app";
 
-// Helper function to create full API endpoint URL (for production)
+/**
+ * Helper function to create full API endpoint URL
+ * Always uses the API_URL from environment variables
+ * No longer relies on Vite proxy
+ */
 export const getAPIEndpoint = (path) => {
-	// If path is already absolute (for production), use as is
+	// If path is already absolute, use as is
 	if (path.startsWith("http")) {
 		return path;
 	}
-	// For relative paths, prepend API_URL if in production (no proxy available)
-	// In development, Vite proxy handles /api/* paths
-	if (import.meta.env.DEV) {
-		return path; // Use Vite proxy in development
-	}
-	// In production, use full URL with API_URL
+	// Always prepend API_URL for full URL (Railway backend requires this)
 	return `${API_URL}${path}`;
 };
 
