@@ -5,9 +5,16 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
 	plugins: [react()],
 	server: {
-		port: 5173, // Standard Vite port
-		// No proxy needed when using deployed Railway backend
-		// API calls will go directly to: https://live-chat-app-production-69b9.up.railway.app
+		port: 5173,
+		// Proxy /api calls to Railway backend to avoid CORS issues in development
+		proxy: {
+			"/api": {
+				target: "https://live-chat-app-production-69b9.up.railway.app",
+				changeOrigin: true,
+				rewrite: (path) => path,
+				secure: false, // Allow self-signed certificates if needed
+			},
+		},
 	},
 	build: {
 		// Optimize build output

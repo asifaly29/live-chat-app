@@ -1,30 +1,43 @@
 /**
  * API Configuration utility
  * Centralizes API URL and Server URL configuration
- * Updated to work with deployed Railway backend
  * 
- * Environment variables:
- * - VITE_API_URL: Backend API URL (https://live-chat-app-production-69b9.up.railway.app)
- * - VITE_SERVER_URL: WebSocket server URL (https://live-chat-app-production-69b9.up.railway.app)
+ * Development:
+ * - REST API routes through Vite proxy to Railway backend
+ * - WebSocket connects directly to Railway
+ * 
+ * Production:
+ * - All requests go directly to Railway backend
  */
 
 // API URL for REST endpoints
-export const API_URL = import.meta.env.VITE_API_URL || "https://live-chat-app-production-69b9.up.railway.app";
+// In dev: http://localhost:5173 (Vite proxy routes to Railway)
+// In prod: https://live-chat-app-production-69b9.up.railway.app (direct connection)
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5173";
 
 // Server URL for Socket.IO connections
+// Always connects directly to Railway backend
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL || "https://live-chat-app-production-69b9.up.railway.app";
 
 /**
  * Helper function to create full API endpoint URL
- * Always uses the API_URL from environment variables
- * No longer relies on Vite proxy
+ * In development: returns relative path (proxy handles routing)
+ * In production: returns full URL to Railway backend
  */
 export const getAPIEndpoint = (path) => {
 	// If path is already absolute, use as is
 	if (path.startsWith("http")) {
 		return path;
 	}
-	// Always prepend API_URL for full URL (Railway backend requires this)
+	
+	// In development, use relative paths (Vite proxy will route to Railway)
+	// In production, prepend full API_URL
+	if (import.meta.env.DEV) {
+		// Development: use relative path, Vite proxy routes to Railway
+		return path;
+	}
+	
+	// Production: use full URL (no proxy available)
 	return `${API_URL}${path}`;
 };
 
