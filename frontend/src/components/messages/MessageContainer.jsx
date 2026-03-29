@@ -4,6 +4,7 @@ import MessageInput from "./MessageInput";
 import Messages from "./Messages";
 import { TiMessages } from "react-icons/ti";
 import { useAuthContext } from "../../context/AuthContext";
+import { IoArrowBack } from "react-icons/io5";
 
 const MessageContainer = () => {
 	const { selectedConversation, setSelectedConversation } = useConversation();
@@ -20,10 +21,24 @@ const MessageContainer = () => {
 				<NoChatSelected />
 			) : (
 				<>
-					{/* Header */}
-					<div className='bg-slate-500 px-2 sm:px-4 py-2 mb-2'>
-						<span className='label-text text-xs sm:text-sm'>To:</span>{" "}
-						<span className='text-gray-900 font-bold text-sm sm:text-base'>{selectedConversation.fullName}</span>
+					{/* MOBILE: Back button + Header */}
+					<div className='bg-slate-500 px-2 sm:px-4 py-2 mb-2 flex items-center gap-2'>
+						{/* Back Button - Mobile only (hidden on md+) */}
+						<button
+							onClick={() => setSelectedConversation(null)}
+							className='md:hidden p-2 hover:opacity-80 transition-opacity min-h-[44px] flex items-center justify-center'
+							title='Back to conversations'
+						>
+							<IoArrowBack className='w-5 h-5' />
+						</button>
+
+						{/* Chat Header Info */}
+						<div className='flex-1 min-w-0'>
+							<span className='label-text text-xs sm:text-sm'>To:</span>{" "}
+							<span className='text-gray-900 font-bold text-sm sm:text-base truncate'>
+								{selectedConversation.fullName}
+							</span>
+						</div>
 					</div>
 					<Messages />
 					<MessageInput />
