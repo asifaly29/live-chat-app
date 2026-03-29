@@ -37,5 +37,6 @@ function App() {
 			<Toaster />
 		</div>
 	);
+}
 
 export default App;
