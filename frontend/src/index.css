@@ -7,6 +7,16 @@ body {
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-position: center;
+	overflow-x: hidden;
+	/* RESPONSIVE: Prevent horizontal scrolling on mobile */
+}
+
+html {
+	/* RESPONSIVE: Safe area support for iPhone notch */
+	padding-top: max(12px, env(safe-area-inset-top));
+	padding-left: max(12px, env(safe-area-inset-left));
+	padding-right: max(12px, env(safe-area-inset-right));
+	padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
 
 /* dark mode looking scrollbar */

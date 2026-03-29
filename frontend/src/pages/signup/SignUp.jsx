@@ -24,60 +24,61 @@ const SignUp = () => {
 	};
 
 	return (
-		<div className='flex flex-col items-center justify-center min-w-96 mx-auto'>
-			<div className='w-full p-6 rounded-lg shadow-md bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0'>
-				<h1 className='text-3xl font-semibold text-center text-gray-300'>
+		<div className='flex flex-col items-center justify-center w-full max-w-md px-4 mx-auto'>
+			{/* RESPONSIVE: Use max-w-md for width constraint, flexible on mobile */}
+			<div className='w-full p-4 sm:p-6 rounded-lg shadow-md bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0'>
+				<h1 className='text-2xl sm:text-3xl font-semibold text-center text-gray-300 mb-6'>
 					Sign Up <span className='text-blue-500'> ChatApp</span>
 				</h1>
 
-				<form onSubmit={handleSubmit}>
+				<form onSubmit={handleSubmit} className='space-y-4'>
 					<div>
 						<label className='label p-2'>
-							<span className='text-base label-text'>Full Name</span>
+							<span className='text-sm sm:text-base label-text'>Full Name</span>
 						</label>
 						<input
 							type='text'
 							placeholder='John Doe'
-							className='w-full input input-bordered  h-10'
+							className='w-full input input-bordered min-h-[44px] text-sm'
 							value={inputs.fullName}
 							onChange={(e) => setInputs({ ...inputs, fullName: e.target.value })}
 						/>
 					</div>
 
 					<div>
-						<label className='label p-2 '>
-							<span className='text-base label-text'>Username</span>
+						<label className='label p-2'>
+							<span className='text-sm sm:text-base label-text'>Username</span>
 						</label>
 						<input
 							type='text'
 							placeholder='johndoe'
-							className='w-full input input-bordered h-10'
+							className='w-full input input-bordered min-h-[44px] text-sm'
 							value={inputs.username}
 							onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
 						/>
 					</div>
 
 					<div>
-						<label className='label'>
-							<span className='text-base label-text'>Password</span>
+						<label className='label p-2'>
+							<span className='text-sm sm:text-base label-text'>Password</span>
 						</label>
 						<input
 							type='password'
 							placeholder='Enter Password'
-							className='w-full input input-bordered h-10'
+							className='w-full input input-bordered min-h-[44px] text-sm'
 							value={inputs.password}
 							onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
 						/>
 					</div>
 
 					<div>
-						<label className='label'>
-							<span className='text-base label-text'>Confirm Password</span>
+						<label className='label p-2'>
+							<span className='text-sm sm:text-base label-text'>Confirm Password</span>
 						</label>
 						<input
 							type='password'
 							placeholder='Confirm Password'
-							className='w-full input input-bordered h-10'
+							className='w-full input input-bordered min-h-[44px] text-sm'
 							value={inputs.confirmPassword}
 							onChange={(e) => setInputs({ ...inputs, confirmPassword: e.target.value })}
 						/>
@@ -87,14 +88,13 @@ const SignUp = () => {
 
 					<Link
 						to={"/login"}
-						className='text-sm hover:underline hover:text-blue-600 mt-2 inline-block'
-						href='#'
+						className='text-xs sm:text-sm hover:underline hover:text-blue-600 inline-block'
 					>
 						Already have an account?
 					</Link>
 
 					<div>
-						<button className='btn btn-block btn-sm mt-2 border border-slate-700' disabled={loading}>
+						<button className='btn btn-block min-h-[44px] text-sm mt-4 border border-slate-700' disabled={loading}>
 							{loading ? <span className='loading loading-spinner'></span> : "Sign Up"}
 						</button>
 					</div>

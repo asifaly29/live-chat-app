@@ -16,11 +16,14 @@ const Message = ({ message }) => {
 	return (
 		<div className={`chat ${chatClassName}`}>
 			<div className='chat-image avatar'>
-				<div className='w-10 rounded-full'>
-					<img alt='Tailwind CSS chat bubble component' src={profilePic} />
+				<div className='w-8 sm:w-10 rounded-full'>
+					<img alt='Tailwind CSS chat bubble component' src={profilePic} className='object-cover' />
 				</div>
 			</div>
-			<div className={`chat-bubble text-white ${bubbleBgColor} ${shakeClass} pb-2`}>{message.message}</div>
+			<div className={`chat-bubble text-white text-sm sm:text-base ${bubbleBgColor} ${shakeClass} pb-2 break-words max-w-[85vw] sm:max-w-[400px]`}>
+				{/* RESPONSIVE: Avatar size responsive, text size responsive, break-words prevents overflow, max-width prevents super-wide bubbles */}
+				{message.message}
+			</div>
 			<div className='chat-footer opacity-50 text-xs flex gap-1 items-center'>{formattedTime}</div>
 		</div>
 	);
