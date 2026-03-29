@@ -14,12 +14,19 @@ const generateToken = (userId, res) => {
   // In production (Vercel frontend + Railway backend): use sameSite: "None" with secure: true
   // In development: use sameSite: "strict" with secure: false
   // This ensures cookies are sent with cross-origin requests in production
+  const isProduction = process.env.NODE_ENV !== "development";
+  const sameSiteValue = process.env.NODE_ENV === "development" ? "strict" : "None";
+  
+  console.log(`🍪 Setting JWT cookie - NODE_ENV: ${process.env.NODE_ENV}, Secure: ${isProduction}, SameSite: ${sameSiteValue}`);
+  
   res.cookie("jwt", token, {
     httpOnly: true, // Prevent JavaScript access (security)
-    secure: process.env.NODE_ENV !== "development", // HTTPS only in production
-    sameSite: process.env.NODE_ENV === "development" ? "strict" : "None", // "None" required for cross-site cookies
+    secure: isProduction, // HTTPS only in production
+    sameSite: sameSiteValue, // "None" required for cross-site cookies
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
+  
+  console.log(`✅ JWT cookie set successfully for user: ${userId}`);
 };
 
 export default generateToken;

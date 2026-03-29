@@ -38,7 +38,8 @@ app.use(cors({
 	origin: process.env.CLIENT_URL || "http://localhost:3000", // Frontend URL from environment
 	methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 	credentials: true, // Allow cookies in cross-origin requests
-	allowedHeaders: ["Content-Type", "Authorization"]
+	allowedHeaders: ["Content-Type", "Authorization"],
+	exposedHeaders: ["Set-Cookie"] // CRITICAL: Expose Set-Cookie header to browser
 }));
 
 // ===== ROUTES =====
@@ -88,4 +89,7 @@ server.listen(PORT, () => {
 	console.log(`🚀 Server is running on port ${PORT}`);
 	console.log(`📱 Socket.IO is connected and listening for events`);
 	console.log(`🔌 Environment: ${process.env.NODE_ENV || "development"}`);
+	console.log(`🌐 CLIENT_URL: ${process.env.CLIENT_URL || "http://localhost:3000"}`);
+	console.log(`🔒 Cookie Security: ${process.env.NODE_ENV !== "development" ? "Secure (production)" : "Non-secure (development)"}`);
+	console.log(`🍪 Cookie SameSite: ${process.env.NODE_ENV === "development" ? "Strict" : "None"}`);
 });
