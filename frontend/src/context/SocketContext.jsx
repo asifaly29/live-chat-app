@@ -18,6 +18,7 @@ export const SocketContextProvider = ({ children }) => {
 		if (authUser) {
 			// Use SERVER_URL from centralized configuration
 			const serverUrl = SERVER_URL;
+			console.log("🔌 Socket.IO connecting to:", serverUrl);
 
 			const socket = io(serverUrl, {
 				query: {
@@ -39,32 +40,38 @@ export const SocketContextProvider = ({ children }) => {
 			 */
 			socket.on("getOnlineUsers", (users) => {
 				setOnlineUsers(users);
-				console.log("Online users updated:", users);
+				console.log("👥 Online users updated:", users);
 			});
 
 			/**
 			 * Handle connection events
 			 */
 			socket.on("connect", () => {
-				console.log("✅ Socket connection established");
+				console.log("✅ Socket.IO connection established");
+				console.log("   User ID:", authUser._id);
+				console.log("   Socket ID:", socket.id);
 			});
 
 			socket.on("disconnect", () => {
-				console.log("❌ Socket disconnected");
+				console.log("⚠️  Socket.IO disconnected");
 			});
 
 			/**
 			 * Handle connection errors
 			 */
 			socket.on("connect_error", (error) => {
-				console.error("Connection error:", error);
+				console.error("❌ Socket.IO connection error:", error);
+				console.error("   This could indicate:");
+				console.error("   1. Backend is down or unreachable");
+				console.error("   2. CORS configuration issue");
+				console.error("   3. Invalid server URL:", serverUrl);
 			});
 
 			/**
 			 * Handle message errors
 			 */
 			socket.on("messageError", (data) => {
-				console.error("Message error:", data.error);
+				console.error("❌ Socket.IO message error:", data.error);
 			});
 
 			// Cleanup on unmount

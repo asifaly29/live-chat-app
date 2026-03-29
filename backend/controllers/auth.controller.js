@@ -130,12 +130,14 @@ export const login = async (req, res) => {
  */
 export const logout = async (req, res) => {
 	try {
-		// Clear the JWT cookie
+		// ===== CLEAR JWT COOKIE WITH PROPER CROSS-SITE SETTINGS =====
+		// Match the same cookie settings used in generateToken for proper deletion
+		// In production, sameSite: "None" with secure: true is required
 		res.cookie("jwt", "", {
 			maxAge: 0,
 			httpOnly: true,
 			secure: process.env.NODE_ENV !== "development",
-			sameSite: "strict",
+			sameSite: process.env.NODE_ENV === "development" ? "strict" : "None",
 		});
 
 		res.status(200).json({ message: "Logged out successfully" });

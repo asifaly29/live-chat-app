@@ -10,11 +10,15 @@ const generateToken = (userId, res) => {
     expiresIn: "7d",
   });
 
+  // ===== COOKIE CONFIGURATION FOR CROSS-SITE REQUESTS =====
+  // In production (Vercel frontend + Railway backend): use sameSite: "None" with secure: true
+  // In development: use sameSite: "strict" with secure: false
+  // This ensures cookies are sent with cross-origin requests in production
   res.cookie("jwt", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV !== "development",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true, // Prevent JavaScript access (security)
+    secure: process.env.NODE_ENV !== "development", // HTTPS only in production
+    sameSite: process.env.NODE_ENV === "development" ? "strict" : "None", // "None" required for cross-site cookies
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 };
 

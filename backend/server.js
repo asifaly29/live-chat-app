@@ -47,8 +47,16 @@ app.get("/", (req, res) => {
 	res.status(200).json({ message: "🚀 API is running" });
 });
 
-// API Routes
-app.use("/api/auth", authRoutes);
+// ===== API HEALTH CHECK =====
+// Simple health check endpoint for frontend to verify connectivity
+// Call from frontend: fetch(`${API_URL}/api/health`, { credentials: "include" })
+app.get("/api/health", (req, res) => {
+	res.status(200).json({
+		status: "ok",
+		message: "Backend is running and accessible",
+		timestamp: new Date().toISOString(),
+	});
+});
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 
