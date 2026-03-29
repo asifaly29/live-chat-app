@@ -4,14 +4,21 @@ import SearchInput from "./SearchInput";
 
 const Sidebar = () => {
 	return (
-		<div className='flex flex-col w-full h-full overflow-x-hidden'>
-			{/* RESPONSIVE: Sidebar takes full height, padding adjusts for mobile/desktop */}
-			<div className='p-2 sm:p-4'>
+		<div className='flex flex-col h-full bg-white overflow-hidden'>
+			{/* HEADER - Search area with fixed height */}
+			<div className='p-3 border-b border-slate-200'>
 				<SearchInput />
 			</div>
-			<div className='divider px-3 my-2 md:my-4'></div>
-			<Conversations />
-			<LogoutButton />
+
+			{/* CONVERSATIONS - Scrollable middle area with flex-1 */}
+			<div className='flex-1 overflow-y-auto'>
+				<Conversations />
+			</div>
+
+			{/* FOOTER - Logout button with fixed height at bottom */}
+			<div className='p-3 border-t border-slate-200'>
+				<LogoutButton />
+			</div>
 		</div>
 	);
 };

@@ -28,7 +28,10 @@ function App() {
 	}, [authUser]);
 
 	return (
-		<div className='px-3 sm:px-4 md:px-6 py-2 h-screen flex items-center justify-center'>
+		<div className='h-screen w-screen flex overflow-hidden'>
+			{/* FULLSCREEN: Facebook Messenger style layout */}
+			{/* Mobile: fullwidth, no margins, no padding */}
+			{/* Desktop: same fullscreen with sidebar + chat areas */}
 			<Routes>
 				<Route path='/' element={authUser ? <Home /> : <Navigate to={"/login"} />} />
 				<Route path='/login' element={authUser ? <Navigate to='/' /> : <Login />} />

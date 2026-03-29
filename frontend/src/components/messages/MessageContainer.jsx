@@ -15,32 +15,35 @@ const MessageContainer = () => {
 	}, [setSelectedConversation]);
 
 	return (
-		<div className='flex-1 flex flex-col min-w-0'>
-			{/* RESPONSIVE: flex-1 for full width on mobile, min-w-0 prevents text overflow */}
+		<div className='flex flex-col w-full h-full overflow-hidden'>
+			{/* FACEBOOK MESSENGER STYLE: Chat window with header, messages, and input */}
 			{!selectedConversation ? (
 				<NoChatSelected />
 			) : (
 				<>
-					{/* MOBILE: Back button + Header */}
-					<div className='bg-slate-500 px-2 sm:px-4 py-2 mb-2 flex items-center gap-2'>
-						{/* Back Button - Mobile only (hidden on md+) */}
+					{/* CHAT HEADER - Always fixed at top with back button on mobile */}
+					<div className='flex items-center p-3 border-b border-slate-200 bg-white sticky top-0 z-10'>
+						{/* Back Button - Mobile only, always visible when chat is open */}
 						<button
 							onClick={() => setSelectedConversation(null)}
-							className='md:hidden p-2 hover:opacity-80 transition-opacity min-h-[44px] flex items-center justify-center'
+							className='md:hidden mr-2 p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] flex items-center justify-center'
 							title='Back to conversations'
 						>
-							<IoArrowBack className='w-5 h-5' />
+							<IoArrowBack className='w-6 h-6 text-gray-800' />
 						</button>
 
 						{/* Chat Header Info */}
 						<div className='flex-1 min-w-0'>
-							<span className='label-text text-xs sm:text-sm'>To:</span>{" "}
-							<span className='text-gray-900 font-bold text-sm sm:text-base truncate'>
+							<h2 className='font-semibold text-gray-900 text-base truncate'>
 								{selectedConversation.fullName}
-							</span>
+							</h2>
 						</div>
 					</div>
+
+					{/* MESSAGES AREA */}
 					<Messages />
+
+					{/* INPUT AREA - Sticky at bottom */}
 					<MessageInput />
 				</>
 			)}

@@ -16,8 +16,8 @@ const Messages = () => {
 	}, [messages]);
 
 	return (
-		<div className='px-2 sm:px-4 flex-1 overflow-auto space-y-2'>
-			{/* RESPONSIVE: Reduced padding on mobile, added space-y for message spacing */}
+		<div className='flex-1 overflow-y-auto p-3 md:p-4 space-y-2 break-words'>
+			{/* FULLSCREEN: flex-1 fills available space, overflow-y-auto for scrolling, break-words prevents text overflow */}
 			{!loading &&
 				messages.length > 0 &&
 				messages.map((message) => (
@@ -28,7 +28,7 @@ const Messages = () => {
 
 			{loading && [...Array(3)].map((_, idx) => <MessageSkeleton key={idx} />)}
 			{!loading && messages.length === 0 && (
-				<p className='text-center text-sm sm:text-base'>Send a message to start the conversation</p>
+				<p className='text-center text-gray-500 text-sm'>Send a message to start the conversation</p>
 			)}
 		</div>
 	);

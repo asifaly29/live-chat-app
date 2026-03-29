@@ -6,22 +6,22 @@ const Home = () => {
 	const { selectedConversation } = useConversation();
 
 	return (
-		<div className='flex h-[60vh] sm:h-[600px] md:h-[550px] rounded-lg overflow-hidden bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0 w-full max-w-5xl'>
-			{/* RESPONSIVE MOBILE/DESKTOP LAYOUT */}
-			{/* Mobile: Show sidebar when no chat selected, show chat when selected */}
-			{/* Desktop: Always show both side-by-side */}
+		<div className='w-full h-full flex overflow-hidden'>
+			{/* FACEBOOK MESSENGER STYLE LAYOUT */}
+			{/* Mobile: Sidebar OR Chat (toggle with selectedConversation) */}
+			{/* Desktop: Sidebar AND Chat side-by-side (always both visible) */}
 
-			{/* Sidebar - Hidden on mobile when chat is open, visible on desktop */}
+			{/* SIDEBAR - Full width on mobile, fixed 1/3 on desktop */}
 			<div className={`${
-				selectedConversation ? "hidden md:flex" : "flex"
-			} flex-col w-full md:w-64 border-r border-slate-500 bg-gray-900`}>
+				selectedConversation ? "hidden" : "flex"
+			} md:flex flex-col w-full md:w-1/3 h-full overflow-hidden border-r border-slate-300 bg-white`}>
 				<Sidebar />
 			</div>
 
-			{/* Chat Area - Hidden on mobile when sidebar open, visible on desktop */}
+			{/* CHAT AREA - Full width on mobile, fixed 2/3 on desktop */}
 			<div className={`${
-				selectedConversation ? "flex" : "hidden md:flex"
-			} flex-col flex-1 min-w-0`}>
+				selectedConversation ? "flex" : "hidden"
+			} md:flex flex-col w-full md:w-2/3 h-full overflow-hidden bg-white`}>
 				<MessageContainer />
 			</div>
 		</div>
