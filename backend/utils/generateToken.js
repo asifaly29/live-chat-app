@@ -11,22 +11,23 @@ const generateToken = (userId, res) => {
   });
 
   // ===== COOKIE CONFIGURATION FOR CROSS-SITE REQUESTS =====
-  // In production (Vercel frontend + Railway backend): use sameSite: "None" with secure: true
-  // In development: use sameSite: "strict" with secure: false
-  // This ensures cookies are sent with cross-origin requests in production
-  const isProduction = process.env.NODE_ENV !== "development";
-  const sameSiteValue = process.env.NODE_ENV === "development" ? "strict" : "None";
+  // CRITICAL: For Vercel → Railway communication, we MUST use:
+  // - secure: true (HTTPS only)
+  // - sameSite: "None" (allows cross-site cookies)
+  // This works regardless of NODE_ENV because Railway always uses HTTPS
   
-  console.log(`🍪 Setting JWT cookie - NODE_ENV: ${process.env.NODE_ENV}, Secure: ${isProduction}, SameSite: ${sameSiteValue}`);
+  const isLocalhost = process.env.PORT === "5000" || !process.env.PORT;
+  
+  console.log(`🍪 Cookie Config - Localhost: ${isLocalhost}`);
   
   res.cookie("jwt", token, {
     httpOnly: true, // Prevent JavaScript access (security)
-    secure: isProduction, // HTTPS only in production
-    sameSite: sameSiteValue, // "None" required for cross-site cookies
+    secure: true, // ALWAYS true because Railway uses HTTPS
+    sameSite: isLocalhost ? "strict" : "None", // "None" for production (Vercel → Railway)
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
   
-  console.log(`✅ JWT cookie set successfully for user: ${userId}`);
+  console.log(`✅ JWT cookie set - sameSite: ${isLocalhost ? "strict" : "None"}, secure: true`);
 };
 
 export default generateToken;

@@ -132,12 +132,13 @@ export const logout = async (req, res) => {
 	try {
 		// ===== CLEAR JWT COOKIE WITH PROPER CROSS-SITE SETTINGS =====
 		// Match the same cookie settings used in generateToken for proper deletion
-		// In production, sameSite: "None" with secure: true is required
+		const isLocalhost = process.env.PORT === "5000" || !process.env.PORT;
+		
 		res.cookie("jwt", "", {
 			maxAge: 0,
 			httpOnly: true,
-			secure: process.env.NODE_ENV !== "development",
-			sameSite: process.env.NODE_ENV === "development" ? "strict" : "None",
+			secure: true, // ALWAYS true because Railway uses HTTPS
+			sameSite: isLocalhost ? "strict" : "None", // "None" for production
 		});
 
 		res.status(200).json({ message: "Logged out successfully" });

@@ -9,9 +9,17 @@ const protectRoute = async (req, res, next) => {
 	try {
 		// Extract JWT token from cookies
 		const token = req.cookies.jwt;
+		
+		// DEBUG: Log cookie info
+		console.log(`🔍 Protecting route ${req.method} ${req.path}`);
+		console.log(`   Cookies received:`, Object.keys(req.cookies).length > 0 ? Object.keys(req.cookies) : "NONE");
+		console.log(`   JWT token present:`, token ? "✅ YES" : "❌ NO");
 
 		// Check if token exists
 		if (!token) {
+			console.error(`❌ No JWT token found in cookies`);
+			console.error(`   Cookies:`, req.cookies);
+			console.error(`   Headers:`, req.headers);
 			return res.status(401).json({ error: "Unauthorized - No token provided" });
 		}
 
