@@ -22,19 +22,19 @@ const MessageContainer = () => {
 			) : (
 				<>
 					{/* CHAT HEADER - Always fixed at top with back button on mobile */}
-					<div className='flex items-center p-3 border-b border-slate-200 bg-white sticky top-0 z-10'>
+					<div className='flex items-center p-3 border-b border-gray-700 bg-gray-900 sticky top-0 z-10'>
 						{/* Back Button - Mobile only, always visible when chat is open */}
 						<button
 							onClick={() => setSelectedConversation(null)}
-							className='md:hidden mr-2 p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] flex items-center justify-center'
+							className='md:hidden mr-2 p-2 hover:bg-gray-800 rounded-full transition-colors min-h-[44px] flex items-center justify-center'
 							title='Back to conversations'
 						>
-							<IoArrowBack className='w-6 h-6 text-gray-800' />
+							<IoArrowBack className='w-6 h-6 text-white' />
 						</button>
 
 						{/* Chat Header Info */}
 						<div className='flex-1 min-w-0'>
-							<h2 className='font-semibold text-gray-900 text-base truncate'>
+							<h2 className='font-semibold text-white text-base truncate'>
 								{selectedConversation.fullName}
 							</h2>
 						</div>

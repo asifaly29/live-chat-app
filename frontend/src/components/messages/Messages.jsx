@@ -16,7 +16,7 @@ const Messages = () => {
 	}, [messages]);
 
 	return (
-		<div className='flex-1 overflow-y-auto p-3 md:p-4 space-y-2 break-words'>
+		<div className='flex-1 overflow-y-auto p-3 md:p-4 space-y-2 break-words bg-gray-800'>
 			{/* FULLSCREEN: flex-1 fills available space, overflow-y-auto for scrolling, break-words prevents text overflow */}
 			{!loading &&
 				messages.length > 0 &&
@@ -28,7 +28,7 @@ const Messages = () => {
 
 			{loading && [...Array(3)].map((_, idx) => <MessageSkeleton key={idx} />)}
 			{!loading && messages.length === 0 && (
-				<p className='text-center text-gray-500 text-sm'>Send a message to start the conversation</p>
+				<p className='text-center text-gray-400 text-sm'>Send a message to start the conversation</p>
 			)}
 		</div>
 	);

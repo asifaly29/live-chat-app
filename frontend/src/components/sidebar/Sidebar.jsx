@@ -4,9 +4,9 @@ import SearchInput from "./SearchInput";
 
 const Sidebar = () => {
 	return (
-		<div className='flex flex-col h-full bg-white overflow-hidden'>
+		<div className='flex flex-col h-full bg-gray-900 overflow-hidden'>
 			{/* HEADER - Search area with fixed height */}
-			<div className='p-3 border-b border-slate-200'>
+			<div className='p-3 border-b border-gray-700'>
 				<SearchInput />
 			</div>
 
@@ -16,7 +16,7 @@ const Sidebar = () => {
 			</div>
 
 			{/* FOOTER - Logout button with fixed height at bottom */}
-			<div className='p-3 border-t border-slate-200'>
+			<div className='p-3 border-t border-gray-700'>
 				<LogoutButton />
 			</div>
 		</div>
