@@ -15,12 +15,20 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// Socket.IO CORS configuration - FIXED for stable connections
 const io = new Server(server, {
 	cors: {
 		origin: process.env.CLIENT_URL || "http://localhost:3000",
 		credentials: true,
-		methods: ["GET", "POST"],
+		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Include all methods for stability
+		allowedHeaders: ["Content-Type", "Authorization"],
 	},
+	transports: ["websocket", "polling"], // Use both transports for reliability
+	reconnection: true,
+	reconnectionDelay: 1000,
+	reconnectionDelayMax: 5000,
+	reconnectionAttempts: Infinity,
 });
 
 const PORT = process.env.PORT || 5000;

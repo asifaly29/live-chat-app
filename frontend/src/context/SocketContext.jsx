@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, useRef } from "react";
 import { useAuthContext } from "./AuthContext";
 import { SERVER_URL } from "../utils/apiConfig";
 import io from "socket.io-client";
@@ -13,24 +13,27 @@ export const SocketContextProvider = ({ children }) => {
 	const [socket, setSocket] = useState(null);
 	const [onlineUsers, setOnlineUsers] = useState([]);
 	const { authUser } = useAuthContext();
+	const socketRef = useRef(null); // Keep reference to prevent re-creation
 
 	useEffect(() => {
-		if (authUser) {
-			// Use SERVER_URL from centralized configuration
+		if (authUser && !socketRef.current) {
+			// Only create socket if it doesn't exist
 			const serverUrl = SERVER_URL;
 			console.log("🔌 Socket.IO connecting to:", serverUrl);
 
-			const socket = io(serverUrl, {
+			const newSocket = io(serverUrl, {
 				query: {
 					userId: authUser._id,
 				},
 				reconnection: true,
 				reconnectionDelay: 1000,
 				reconnectionDelayMax: 5000,
-				reconnectionAttempts: 5,
+				reconnectionAttempts: Infinity, // Keep trying to reconnect
+				transports: ["websocket", "polling"], // Support both transports
 			});
 
-			setSocket(socket);
+			socketRef.current = newSocket;
+			setSocket(newSocket);
 
 			// ===== SOCKET EVENT LISTENERS =====
 
@@ -38,7 +41,7 @@ export const SocketContextProvider = ({ children }) => {
 			 * Receive online users list from server
 			 * Updates whenever a user connects or disconnects
 			 */
-			socket.on("getOnlineUsers", (users) => {
+			newSocket.on("getOnlineUsers", (users) => {
 				setOnlineUsers(users);
 				console.log("👥 Online users updated:", users);
 			});
@@ -46,45 +49,56 @@ export const SocketContextProvider = ({ children }) => {
 			/**
 			 * Handle connection events
 			 */
-			socket.on("connect", () => {
+			newSocket.on("connect", () => {
 				console.log("✅ Socket.IO connection established");
 				console.log("   User ID:", authUser._id);
-				console.log("   Socket ID:", socket.id);
+				console.log("   Socket ID:", newSocket.id);
 			});
 
-			socket.on("disconnect", () => {
-				console.log("⚠️  Socket.IO disconnected");
+			newSocket.on("disconnect", (reason) => {
+				console.warn("⚠️  Socket.IO disconnected. Reason:", reason);
+				// Auto-reconnect is handled by reconnection option above
+			});
+
+			newSocket.on("reconnect", () => {
+				console.log("🔄 Socket.IO reconnected successfully");
+			});
+
+			newSocket.on("reconnect_attempt", () => {
+				console.log("🔄 Attempting to reconnect Socket.IO...");
 			});
 
 			/**
 			 * Handle connection errors
 			 */
-			socket.on("connect_error", (error) => {
+			newSocket.on("connect_error", (error) => {
 				console.error("❌ Socket.IO connection error:", error);
-				console.error("   This could indicate:");
-				console.error("   1. Backend is down or unreachable");
-				console.error("   2. CORS configuration issue");
-				console.error("   3. Invalid server URL:", serverUrl);
+				console.error("   Error details:", error.message);
+				console.error("   Server URL:", serverUrl);
 			});
 
 			/**
 			 * Handle message errors
 			 */
-			socket.on("messageError", (data) => {
+			newSocket.on("messageError", (data) => {
 				console.error("❌ Socket.IO message error:", data.error);
 			});
 
 			// Cleanup on unmount
 			return () => {
-				socket.close();
+				if (socketRef.current) {
+					socketRef.current.disconnect();
+					socketRef.current = null;
+					setSocket(null);
+				}
 			};
-		} else {
-			if (socket) {
-				socket.close();
-				setSocket(null);
-			}
+		} else if (!authUser && socketRef.current) {
+			// Disconnect if user logs out
+			socketRef.current.disconnect();
+			socketRef.current = null;
+			setSocket(null);
 		}
-	}, [authUser]);
+	}, [authUser]); // Only depend on authUser - stable dependency
 
 	return (
 		<SocketContext.Provider value={{ socket, onlineUsers }}>

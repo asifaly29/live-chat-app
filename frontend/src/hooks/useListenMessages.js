@@ -17,26 +17,37 @@ const useListenMessages = () => {
 	} = useConversation();
 
 	useEffect(() => {
-		socket?.on("newMessage", (newMessage) => {
+		if (!socket) return;
+
+		// Get the latest state values from the component at listener registration time
+		const handleNewMessage = (newMessage) => {
 			newMessage.shouldShake = true;
 			const sound = new Audio(notificationSound);
 			sound.play();
 
-			const isForSelectedConversation = selectedConversation && selectedConversation._id === newMessage.senderId;
+			// Use the latest values from zustand store (not from closure)
+			const { messages: currentMessages, selectedConversation: currentSelected, unreadCounts: currentUnreadCounts } = useConversation.getState();
+			
+			const isForSelectedConversation = currentSelected && currentSelected._id === newMessage.senderId;
 
 			if (isForSelectedConversation) {
-				setMessages([...messages, newMessage]);
+				setMessages([...currentMessages, newMessage]);
 				// Reset unread count if viewing this conversation
-				if (unreadCounts[newMessage.senderId] > 0) {
+				if (currentUnreadCounts[newMessage.senderId] > 0) {
 					resetUnreadCount(newMessage.senderId);
 				}
 			} else {
 				// Message is for a different conversation, increment unread count
 				incrementUnreadCount(newMessage.senderId);
 			}
-		});
+		};
 
-		return () => socket?.off("newMessage");
-	}, [socket, setMessages, messages, selectedConversation, incrementUnreadCount, resetUnreadCount, unreadCounts]);
+		socket.on("newMessage", handleNewMessage);
+
+		// Cleanup: remove listener
+		return () => {
+			socket.off("newMessage", handleNewMessage);
+		};
+	}, [socket, setMessages, incrementUnreadCount, resetUnreadCount]); // Only depend on stable values
 };
 export default useListenMessages;

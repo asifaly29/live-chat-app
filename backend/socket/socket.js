@@ -18,17 +18,28 @@ let globalIO = null;
 export const initializeSocketHandlers = (io) => {
 	globalIO = io; // Store io instance globally
 
+	// Global error handler for Socket.IO
+	io.on("error", (error) => {
+		console.error("❌ Socket.IO Server Error:", error);
+	});
+
 	io.on("connection", (socket) => {
 		console.log(`📡 User connected: ${socket.id}`);
 
 		// Extract userId from query parameters
 		const userId = socket.handshake.query.userId;
 
-		// Store the socket mapping if userId exists
-		if (userId) {
-			userSocketMap.set(userId, socket.id);
-			console.log(`✅ User ${userId} mapped to socket ${socket.id}`);
+		// Validate userId exists
+		if (!userId) {
+			console.warn("⚠️ Connection attempt without userId - disconnecting");
+			socket.disconnect();
+			return;
 		}
+
+		// Store the socket mapping
+		userSocketMap.set(userId, socket.id);
+		console.log(`✅ User ${userId} mapped to socket ${socket.id}`);
+		console.log(`📊 Total online users: ${userSocketMap.size}`);
 
 		// Emit updated online users list to all connected clients
 		const onlineUserIds = Array.from(userSocketMap.keys());
@@ -40,63 +51,71 @@ export const initializeSocketHandlers = (io) => {
 		 * Handle new message event
 		 * Broadcast message to specific receiver in real-time
 		 */
-		socket.on("sendMessage", (data) => {
-			const { receiverId, message, senderId, senderFullName, senderProfilePic } = data;
+		socket.on("sendMessage", (data, callback) => {
+			try {
+				const { receiverId, message, senderId, senderFullName, senderProfilePic } = data;
 
-			// Make sure receiver exists and sender is authenticated
-			if (!receiverId || !senderId) {
-				console.error("❌ Invalid message data - missing senderId or receiverId");
-				socket.emit("messageError", { error: "Invalid message data" });
-				return;
-			}
+				// Validate message data
+				if (!receiverId || !senderId || typeof message !== "string") {
+					console.error("❌ Invalid message data:", { receiverId, senderId, messageType: typeof message });
+					if (typeof callback === "function") {
+						callback({ success: false, error: "Invalid message data" });
+					}
+					socket.emit("messageError", { error: "Invalid message data" });
+					return;
+				}
 
-			// Get receiver's socket ID
-			const receiverSocketId = userSocketMap.get(receiverId);
+				// Get receiver's socket ID
+				const receiverSocketId = userSocketMap.get(receiverId);
 
-			if (receiverSocketId) {
-				// Emit message only to the specific receiver (using to)
-				io.to(receiverSocketId).emit("newMessage", {
-					senderId,
-					senderFullName,
-					senderProfilePic,
-					message,
-					createdAt: new Date(),
-				});
-				console.log(`📨 Message sent from ${senderId} to ${receiverId}`);
-			} else {
-				console.log(`⚠️ Receiver ${receiverId} is offline - message will be fetched on reconnect`);
+				if (receiverSocketId) {
+					// Emit message only to the specific receiver
+					io.to(receiverSocketId).emit("newMessage", {
+						senderId,
+						senderFullName,
+						senderProfilePic,
+						message,
+						createdAt: new Date(),
+					});
+					console.log(`📨 Message sent from ${senderId} to ${receiverId}`);
+					
+					// Send success callback if provided
+					if (typeof callback === "function") {
+						callback({ success: true });
+					}
+				} else {
+					console.log(`⚠️ Receiver ${receiverId} is offline - message queued for delivery`);
+					// Still consider it success since frontend will handle offline scenarios
+					if (typeof callback === "function") {
+						callback({ success: true, offline: true });
+					}
+				}
+			} catch (error) {
+				console.error("❌ Error handling sendMessage:", error);
+				socket.emit("messageError", { error: "Failed to send message" });
+				if (typeof callback === "function") {
+					callback({ success: false, error: error.message });
+				}
 			}
 		});
 
 		/**
-		 * Handle user disconnect
-		 */
-		socket.on("disconnect", () => {
-			console.log(`❌ User disconnected: ${socket.id}`);
-
-			// Remove user from online map
-			if (userId) {
-				userSocketMap.delete(userId);
-				console.log(`➖ User ${userId} removed from online users`);
-			}
-
-			// Emit updated online users list to all remaining clients
-			const remainingOnlineUsers = Array.from(userSocketMap.keys());
-			io.emit("getOnlineUsers", remainingOnlineUsers);
-		});
-
-		/**
-		 * Handle typing indicator (optional feature for future enhancement)
+		 * Handle typing indicator
 		 */
 		socket.on("userTyping", (data) => {
-			const { receiverId } = data;
-			const receiverSocketId = userSocketMap.get(receiverId);
-
-			if (receiverSocketId) {
-				io.to(receiverSocketId).emit("userTyping", {
-					senderId: userId,
-					isTyping: true,
-				});
+			try {
+				const { receiverId } = data;
+				if (!receiverId) return;
+				
+				const receiverSocketId = userSocketMap.get(receiverId);
+				if (receiverSocketId) {
+					io.to(receiverSocketId).emit("userTyping", {
+						senderId: userId,
+						isTyping: true,
+					});
+				}
+			} catch (error) {
+				console.error("❌ Error handling userTyping:", error);
 			}
 		});
 
@@ -104,15 +123,45 @@ export const initializeSocketHandlers = (io) => {
 		 * Handle typing stopped
 		 */
 		socket.on("userStoppedTyping", (data) => {
-			const { receiverId } = data;
-			const receiverSocketId = userSocketMap.get(receiverId);
-
-			if (receiverSocketId) {
-				io.to(receiverSocketId).emit("userStoppedTyping", {
-					senderId: userId,
-					isTyping: false,
-				});
+			try {
+				const { receiverId } = data;
+				if (!receiverId) return;
+				
+				const receiverSocketId = userSocketMap.get(receiverId);
+				if (receiverSocketId) {
+					io.to(receiverSocketId).emit("userStoppedTyping", {
+						senderId: userId,
+						isTyping: false,
+					});
+				}
+			} catch (error) {
+				console.error("❌ Error handling userStoppedTyping:", error);
 			}
+		});
+
+		/**
+		 * Handle socket errors
+		 */
+		socket.on("error", (error) => {
+			console.error(`❌ Socket error for user ${userId}:`, error);
+		});
+
+		/**
+		 * Handle user disconnect
+		 */
+		socket.on("disconnect", (reason) => {
+			console.log(`❌ User disconnected: ${socket.id} - Reason: ${reason}`);
+
+			// Remove user from online map
+			if (userId) {
+				userSocketMap.delete(userId);
+				console.log(`➖ User ${userId} removed from online users`);
+				console.log(`📊 Total online users: ${userSocketMap.size}`);
+			}
+
+			// Emit updated online users list to all remaining clients
+			const remainingOnlineUsers = Array.from(userSocketMap.keys());
+			io.emit("getOnlineUsers", remainingOnlineUsers);
 		});
 	});
 };
