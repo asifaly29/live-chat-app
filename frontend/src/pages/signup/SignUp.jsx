@@ -28,7 +28,7 @@ const SignUp = () => {
 			{/* RESPONSIVE: Use max-w-md for width constraint, flexible on mobile */}
 			<div className='w-full p-4 sm:p-6 rounded-lg shadow-md bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0'>
 				<h1 className='text-2xl sm:text-3xl font-semibold text-center text-gray-300 mb-6'>
-					Sign Up <span className='text-blue-500'> ChatApp</span>
+					Sign Up <span className='text-yellow-500'> ChatHub</span>
 				</h1>
 
 				<form onSubmit={handleSubmit} className='space-y-4'>
